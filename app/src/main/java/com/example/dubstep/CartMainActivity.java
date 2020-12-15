@@ -6,7 +6,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,7 +41,7 @@ public class CartMainActivity extends AppCompatActivity {
     private TextView mPriceTotal;
     private TextView mCartTotal;
     private TextView mDiscount;
-
+    private String myOrderMessage;
     private DatabaseReference userref;
     private DatabaseReference mCartRef;
     private FirebaseAuth firebaseAuth;
@@ -56,52 +60,70 @@ public class CartMainActivity extends AppCompatActivity {
 
         setUpTotals();
         setUpRecycler();
-
-
-
         mplaceOrder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final Intent intent = new Intent(CartMainActivity.this,MapsActivity.class);
-                intent.putExtra("UID",firebaseAuth.getCurrentUser().getUid());
-
-                userref.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        user u = dataSnapshot.getValue(user.class);
-                        intent.putExtra("PhoneNumber", u.PhoneNumber);
-
-                        mCartRef.child("Info").addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                CartInfo cartInfo = dataSnapshot.getValue(CartInfo.class);
-                                intent.putExtra("cartTotal", Double.toString(cartInfo.getCartTotal()) );
-
-                                startActivity(intent);
-
-                                //Toast.makeText(CartMainActivity.this,"Cart Total : "+cartInfo.getCartTotal(),Toast.LENGTH_SHORT).show();
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                            }
-                        });
-
-                        //startActivity(intent);
-                        //Toast.makeText(CartMainActivity.this,"Phone Number : "+u.PhoneNumber,Toast.LENGTH_SHORT).show();
+                PackageManager pm = getPackageManager();
+                try {
+                    PackageInfo info = pm.getPackageInfo("com.whatsapp",PackageManager.GET_META_DATA);
+                    if (info!=null){
+//                        TODO: change the phone no. to clients business whatsapp no.
+                        String phoneNumberWithCountryCode = "+919853386480";
+                        String message = createMessage();
+                        Intent sendIntent = new Intent(Intent.ACTION_VIEW);
+                        sendIntent.setData(Uri.parse(String.format("https://api.whatsapp.com/send?phone=%s&text=%s",
+                                phoneNumberWithCountryCode,
+                                message)));
+                        sendIntent.setPackage("com.whatsapp");
+                        startActivity(sendIntent);
                     }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                    }
-                });
+                } catch (PackageManager.NameNotFoundException e){
+                    Toast.makeText(getBaseContext(),"Whatsapp is not installed please install that first",Toast.LENGTH_SHORT).show();
 
-
-
+                }
+//                final Intent intent = new Intent(CartMainActivity.this,MapsActivity.class);
+//                intent.putExtra("UID",firebaseAuth.getCurrentUser().getUid());
+//
+//                userref.addListenerForSingleValueEvent(new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                        user u = dataSnapshot.getValue(user.class);
+//                        intent.putExtra("PhoneNumber", u.PhoneNumber);
+//
+//                        mCartRef.child("Info").addListenerForSingleValueEvent(new ValueEventListener() {
+//                            @Override
+//                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                CartInfo cartInfo = dataSnapshot.getValue(CartInfo.class);
+//                                intent.putExtra("cartTotal", Double.toString(cartInfo.getCartTotal()) );
+//
+//                                startActivity(intent);
+//
+//                                //Toast.makeText(CartMainActivity.this,"Cart Total : "+cartInfo.getCartTotal(),Toast.LENGTH_SHORT).show();
+//                            }
+//
+//                            @Override
+//                            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                            }
+//                        });
+//
+//                        //startActivity(intent);
+//                        //Toast.makeText(CartMainActivity.this,"Phone Number : "+u.PhoneNumber,Toast.LENGTH_SHORT).show();
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                    }
+//                });
             }
         });
+    }
+
+    private String createMessage() {
+        return myOrderMessage;
     }
 
     private void setUpTotals() {
@@ -118,11 +140,20 @@ public class CartMainActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 int cartTotal = 0;
+                myOrderMessage = "";
+                int index = 0;
                 if(dataSnapshot.exists()){
                     for(DataSnapshot snap: dataSnapshot.getChildren()){
+                        index++;
                         CartItem item = snap.getValue(CartItem.class);
                         cartTotal += (Integer.parseInt(item.getPrice()) * Integer.parseInt(item.getQuantity()));
-
+                        myOrderMessage = myOrderMessage +
+                                String.format(
+                                        "Item %s : %s , Qty : %s \n",
+                                        index,
+                                        item.getName(),
+                                        item.getQuantity()
+                                );
                         final int finalCartTotal = cartTotal;
                         userref.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
