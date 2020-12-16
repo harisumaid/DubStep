@@ -42,7 +42,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Total Price : xxx"
+            android:text="Total Price : ₹ --"
             android:textAlignment="center"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -60,6 +60,7 @@
         android:id="@+id/linearLayout2"
         android:layout_width="409dp"
         android:layout_height="wrap_content"
+        android:paddingVertical="5dp"
         android:layout_marginStart="1dp"
         android:layout_marginEnd="1dp"
         android:orientation="vertical"
@@ -71,14 +72,14 @@
             android:id="@+id/cart_total_textView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Cart Total : xxxx"
+            android:text="Cart Total : ₹ ---"
             android:textAlignment="center"/>
 
         <TextView
-            android:id="@+id/DdiscountTextView"
+            android:id="@+id/DdeliveryTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="discount : xx% "
+            android:text="Delivery Charge : ₹ --"
             android:textAlignment="center"/>
     </LinearLayout>
 

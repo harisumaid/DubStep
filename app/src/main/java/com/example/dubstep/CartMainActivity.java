@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -17,6 +18,7 @@ import android.widget.Toast;
 
 import com.example.dubstep.Model.CartInfo;
 import com.example.dubstep.Model.CartItem;
+import com.example.dubstep.Model.User;
 import com.example.dubstep.ViewHolder.CartItemsAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -40,8 +42,8 @@ public class CartMainActivity extends AppCompatActivity {
     private MaterialButton mplaceOrder;
     private TextView mPriceTotal;
     private TextView mCartTotal;
-    private TextView mDiscount;
     private String myOrderMessage;
+    private TextView mDelivery;
     private DatabaseReference userref;
     private DatabaseReference mCartRef;
     private FirebaseAuth firebaseAuth;
@@ -76,6 +78,7 @@ public class CartMainActivity extends AppCompatActivity {
                                 message)));
                         sendIntent.setPackage("com.whatsapp");
                         startActivity(sendIntent);
+
                     }
 
 
@@ -127,10 +130,17 @@ public class CartMainActivity extends AppCompatActivity {
     }
 
     private void setUpTotals() {
+        final ProgressDialog progressDialog = new ProgressDialog(CartMainActivity.this);
+        progressDialog.show();
+        progressDialog.setContentView(R.layout.progress_dialog);
+        progressDialog.getWindow().setBackgroundDrawableResource(
+                android.R.color.transparent
+        );
 
         mPriceTotal = findViewById(R.id.total_price_text_view);
         mCartTotal = findViewById(R.id.cart_total_textView);
-        mDiscount = findViewById(R.id.DdiscountTextView);
+//        TODO: use R.id.DdiscountTextView as R.id.DdeliveryTextView
+        mDelivery = findViewById(R.id.DdeliveryTextView);
 
         //int cartTotal = 0;
         //double discount = 0;
@@ -158,20 +168,18 @@ public class CartMainActivity extends AppCompatActivity {
                         userref.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                double discount = 0;
-                                user u = dataSnapshot.getValue(user.class);
-                                if(u.CustomerType.equals("Regular"))
-                                    discount = 25;
+//                                TODO: Delivery Charge addition
+                                double deliveryCharge = 0;
 
-                                mDiscount.setText("Regular Customer Discount : "+discount+"%");
+                                mDelivery.setText("Delivery Charge : \u20B9 "+deliveryCharge);
 
-                                double TotalPrice = finalCartTotal *(100-discount)/100;
+                                double TotalPrice = finalCartTotal -deliveryCharge;
 
-                                mPriceTotal.setText("Total Price : "+TotalPrice);
+                                mPriceTotal.setText("Total Price : \u20B9 "+TotalPrice);
 
                                 HashMap<String,Object> cartInfo = new HashMap<>();
                                 cartInfo.put("CartItemsTotal",finalCartTotal);
-                                cartInfo.put("Discount",discount);
+                                cartInfo.put("Delivery",deliveryCharge);
                                 cartInfo.put("CartTotal",TotalPrice);
 
                                 mCartRef.child("Info").setValue(cartInfo);
@@ -188,7 +196,9 @@ public class CartMainActivity extends AppCompatActivity {
                     }
                 }
 
-                mCartTotal.setText("CART TOTAL : "+cartTotal);
+                mCartTotal.setText("CART TOTAL : \u20B9 "+cartTotal);
+                progressDialog.dismiss();
+
             }
 
             @Override

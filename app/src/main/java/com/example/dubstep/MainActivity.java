@@ -9,9 +9,9 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,8 +21,8 @@ import android.widget.Toast;
 
 
 import com.example.dubstep.Interface.ItemClickListener;
-import com.example.dubstep.Model.CartItem;
 import com.example.dubstep.Model.FoodItem;
+import com.example.dubstep.Model.User;
 import com.example.dubstep.ViewHolder.FoodItemViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -32,7 +32,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.button.MaterialButton;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
@@ -63,7 +62,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private NavigationView navigationView;
     private GoogleSignInClient mGoogleSignInClient;
     private FloatingActionButton mCartButton;
-    user current_user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,21 +91,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
         userref = FirebaseDatabase.getInstance().getReference("user").child(firebaseAuth.getCurrentUser().getUid().toString());
-        userref.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                current_user = dataSnapshot.getValue(user.class);
-
-                if(current_user.Role.equals("Rider")){
-                    gotorider();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
 
 
         toolbar = findViewById(R.id.main_toolbar);
@@ -150,11 +133,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
-    private void gotorider() {
-        Intent intent = new Intent(MainActivity.this,RiderMainActivity.class);
-        startActivity(intent);
-        finish();
-    }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -202,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     protected void onBindViewHolder(@NonNull final FoodItemViewHolder holder, final int position, @NonNull FoodItem model) {
 
                         holder.mFoodItemName.setText(model.getName());
-                        holder.mFoodItemPrice.setText("Price: "+model.getBase_price());
+                        holder.mFoodItemPrice.setText("Price: \u20B9 "+model.getBase_price());
                         holder.mAddToCart.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
