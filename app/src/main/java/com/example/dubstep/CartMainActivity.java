@@ -70,7 +70,7 @@ public class CartMainActivity extends AppCompatActivity {
                     PackageInfo info = pm.getPackageInfo("com.whatsapp",PackageManager.GET_META_DATA);
                     if (info!=null){
 //                        TODO: change the phone no. to clients business whatsapp no.
-                        String phoneNumberWithCountryCode = "+919853386480";
+                        String phoneNumberWithCountryCode = "+916371830551";
                         String message = createMessage();
                         Intent sendIntent = new Intent(Intent.ACTION_VIEW);
                         sendIntent.setData(Uri.parse(String.format("https://api.whatsapp.com/send?phone=%s&text=%s",
@@ -139,7 +139,6 @@ public class CartMainActivity extends AppCompatActivity {
 
         mPriceTotal = findViewById(R.id.total_price_text_view);
         mCartTotal = findViewById(R.id.cart_total_textView);
-//        TODO: use R.id.DdiscountTextView as R.id.DdeliveryTextView
         mDelivery = findViewById(R.id.DdeliveryTextView);
 
         //int cartTotal = 0;
@@ -152,6 +151,9 @@ public class CartMainActivity extends AppCompatActivity {
                 int cartTotal = 0;
                 myOrderMessage = "";
                 int index = 0;
+//              TODO: Delivery Charge addition
+
+                final double deliveryCharge = 0;
                 if(dataSnapshot.exists()){
                     for(DataSnapshot snap: dataSnapshot.getChildren()){
                         index++;
@@ -168,12 +170,10 @@ public class CartMainActivity extends AppCompatActivity {
                         userref.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                                TODO: Delivery Charge addition
-                                double deliveryCharge = 0;
 
                                 mDelivery.setText("Delivery Charge : \u20B9 "+deliveryCharge);
 
-                                double TotalPrice = finalCartTotal -deliveryCharge;
+                                double TotalPrice = finalCartTotal + deliveryCharge;
 
                                 mPriceTotal.setText("Total Price : \u20B9 "+TotalPrice);
 
@@ -195,6 +195,7 @@ public class CartMainActivity extends AppCompatActivity {
 
                     }
                 }
+                myOrderMessage += "Total Price : \u20B9 "+(cartTotal+deliveryCharge)+"\n";
 
                 mCartTotal.setText("CART TOTAL : \u20B9 "+cartTotal);
                 progressDialog.dismiss();

@@ -7,6 +7,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -41,9 +42,6 @@ public class SignUpActivity extends AppCompatActivity {
         txtMobileNumber = (EditText) findViewById(R.id.MobileNumberEditText);
         txtpassword = (EditText) findViewById(R.id.PasswordEditText);
         SignUp = (Button) findViewById(R.id.SignUpButton);
-
-        databaseReference = FirebaseDatabase.getInstance().getReference("user");
-
         firebaseAuth = FirebaseAuth.getInstance();
 
         SignUp.setOnClickListener(new View.OnClickListener() {
@@ -106,7 +104,7 @@ public class SignUpActivity extends AppCompatActivity {
                                             MobileNumber,
                                             email
                                     );
-
+                                    Log.d("SignUp", "onComplete: "+FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
                                      FirebaseDatabase.getInstance().getReference("user")
                                              .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                                              .setValue(details).addOnCompleteListener(new OnCompleteListener<Void>() {
