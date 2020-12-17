@@ -124,25 +124,17 @@ public class LoginActivity extends AppCompatActivity {
                                             .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).addValueEventListener(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                            String Role = dataSnapshot.child("Role").getValue().toString();
-                                            if (Role.equals("Customer")){
                                                 progressDialog.dismiss();
                                                 startActivity(new Intent(LoginActivity.this, MainActivity.class));
                                                 finish();
                                             }
-                                            else if (Role.equals("Rider")) {
-                                                progressDialog.dismiss();
-                                                startActivity(new Intent(LoginActivity.this, RiderMainActivity.class));
-                                                finish();
-                                            }
-
-                                        }
 
                                         @Override
-                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                                        public void onCancelled(@NonNull DatabaseError error) {
                                             progressDialog.dismiss();
                                             Toast.makeText(LoginActivity.this,  "Error fetching Rider or Customer from database",Toast.LENGTH_SHORT).show();
                                         }
+
                                     });
 
 
