@@ -18,6 +18,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -98,30 +100,44 @@ public class SignUpActivity extends AppCompatActivity {
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if (task.isSuccessful()) {
 
-                                     User details = new User(
+                                     final User details = new User(
                                             fullName,
                                             Username,
                                             MobileNumber,
                                             email
                                     );
-                                    Log.d("SignUp", "onComplete: "+FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
-                                     FirebaseDatabase.getInstance().getReference("user")
-                                             .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                             .setValue(details).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                         @Override
-                                         public void onComplete(@NonNull Task<Void> task) {
-                                             Toast.makeText(SignUpActivity.this, "Registration successful", Toast.LENGTH_SHORT).show();
-                                             startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                                             progressDialog1.dismiss();
-                                         }
-                                     });
+
+                                    FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+                                    UserProfileChangeRequest profileUpdate = new UserProfileChangeRequest.Builder()
+                                            .setDisplayName(details.Username)
+                                            .build();
+
+                                    firebaseUser.updateProfile(profileUpdate).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            Log.d("user", "User Profile Name Changed");
+                                            FirebaseDatabase.getInstance().getReference("user")
+                                                    .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                                    .setValue(details).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    Toast.makeText(SignUpActivity.this, "Registration successful", Toast.LENGTH_SHORT).show();
+                                                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                                                    progressDialog1.dismiss();
+                                                    finish();
+                                                }
+                                            });
+                                        }
+                                    });
 
 
                                 } else {
 
                                     Toast.makeText(SignUpActivity.this, "Authentication failed", Toast.LENGTH_SHORT).show();
+                                    progressDialog1.dismiss();
 
                                 }
+
 
                             }
                         });

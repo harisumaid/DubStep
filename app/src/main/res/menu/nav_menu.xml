@@ -1,14 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:title="">
-        <menu>
-            <item android:id="@+id/nav_home" android:title="Home"/>
-            <item android:id="@+id/profile_nav" android:title="Profile"/>
-        </menu>
-    </item>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view"
+    >
+
+    <group>
+        <item
+            android:id="@+id/nav_home"
+            android:title="Home"
+            android:icon="@drawable/ic_baseline_home_24"
+            />
+        <item
+            android:id="@+id/profile_nav"
+            android:title="Profile"
+            android:icon="@drawable/ic_baseline_person_outline_24"
+            />
+    </group>
+
     <item android:title="APP">
         <menu>
-            <item android:id="@+id/log_out" android:title="Log_Out"/>
+            <item
+                android:id="@+id/log_out"
+                android:title="Log Out"
+                android:icon="@drawable/ic_baseline_login_24"
+                />
         </menu>
     </item>
 </menu>
