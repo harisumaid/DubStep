@@ -25,6 +25,7 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -138,6 +139,17 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
                                             .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                                             .child("Username").setValue(User_Name);
                                     mUsername.setText(User_Name);
+                                    FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+                                    UserProfileChangeRequest request = new UserProfileChangeRequest.Builder()
+                                            .setDisplayName(User_Name)
+                                            .build();
+                                    firebaseUser.updateProfile(request).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            
+                                        }
+                                    });
+
                                 }
                                 if (!E_mail.equals(Email)) {
                                     FirebaseDatabase.getInstance().getReference("user")
