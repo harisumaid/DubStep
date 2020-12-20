@@ -100,6 +100,7 @@ public class SelectAddressActivity extends AppCompatActivity {
         intent.putExtra("address3",address3.getText());
         intent.putExtra("message",getIntent().getStringExtra("message"));
         intent.putExtra("wanumber",getIntent().getStringExtra("wanumber"));
+        intent.putExtra("cartTotal",getIntent().getStringExtra("cartTotal"));
         startActivity(intent);
         finish();
 

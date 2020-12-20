@@ -17,16 +17,26 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class ReferralActivity extends AppCompatActivity {
     EditText referral;
     Button placeOrder;
+    TextView promoCodeText;
+    TextView cartTotal;
+    TextView totalPrice;
+    Double totalDiscountPrice;
+    boolean promoUsed;
+    String currPromo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +46,14 @@ public class ReferralActivity extends AppCompatActivity {
 
         referral = findViewById(R.id.edit_text_referral);
         placeOrder = findViewById(R.id.button_place_order);
+        promoCodeText = findViewById(R.id.promocode_dicount_text);
+        cartTotal = findViewById(R.id.cart_total_without_promo);
+        totalPrice = findViewById(R.id.cart_total_with_promo);
+        double cartTotalPrice = Double.parseDouble(getIntent().getStringExtra("cartTotal"));
+        totalDiscountPrice = cartTotalPrice;
+        cartTotal.setText(String.format("Cart Price : ₹ %s",cartTotalPrice));
+        totalPrice.setText(String.format("Total Price : ₹ %s",totalDiscountPrice));
+        promoUsed = false;
 
 
 
@@ -68,6 +86,7 @@ public class ReferralActivity extends AppCompatActivity {
                 try {
                     Intent intent = getIntent();
                     String message = intent.getStringExtra("message");
+                    message+=String.format("Total Price: %s \n ",totalDiscountPrice);
                     message+=String.format("Pincode: %s \n",intent.getStringExtra("pincode"));
                     message+=String.format("Address1: %s \n",intent.getStringExtra("address1"));
                     message+=String.format("Address2: %s \n",intent.getStringExtra("address2"));
@@ -91,6 +110,16 @@ public class ReferralActivity extends AppCompatActivity {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
 //                              2. goto activity before cart
+//                                add user to promocode used
+                                if (promoUsed){
+                                    FirebaseDatabase.getInstance().getReference()
+                                            .child("promocode")
+                                            .child(currPromo)
+                                            .child("users")
+                                            .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                            .setValue(true);
+
+                                }
                                 startActivity(sendIntent);
                                 finish();
                             }
@@ -112,4 +141,52 @@ public class ReferralActivity extends AppCompatActivity {
     }
 
 
+    public void applyPromo(View view) {
+//        search if promocode exists
+        FirebaseDatabase.getInstance().getReference()
+                .child("promocode")
+                .child(referral.getText().toString())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()){
+//                            promocode exists
+//                            now check for user exists within it or not
+                            if (!snapshot.child("users").hasChild(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+//                                user has not used that promo
+                                double discount = Double.parseDouble(snapshot.child("discount").getValue().toString()) ;
+                                double cartTotalPrice = Double.parseDouble(getIntent().getStringExtra("cartTotal"));
+                                promoCodeText.setText(String.format("Promocode Applied \n Discount : %s %% ", discount));
+                                cartTotal.setText(String.format("Cart Price : ₹ %s",cartTotalPrice));
+                                totalDiscountPrice = cartTotalPrice - (discount/100.0*cartTotalPrice);
+                                totalPrice.setText(String.format("Total Price : ₹ %s",totalDiscountPrice));
+                                promoUsed = true;
+                                currPromo = referral.getText().toString();
+                            } else {
+                                promoUsed = false;
+                                promoCodeText.setText("Promocode can be used only once");
+                                double cartTotalPrice = Double.parseDouble(getIntent().getStringExtra("cartTotal"));
+                                totalDiscountPrice = cartTotalPrice;
+                                cartTotal.setText(String.format("Cart Price : ₹ %s",cartTotalPrice));
+                                totalPrice.setText(String.format("Total Price : ₹ %s",totalDiscountPrice));
+                            }
+
+
+                        } else{
+                            promoUsed = false;
+                            promoCodeText.setText("Promocode doesn't exists");
+                            double cartTotalPrice = Double.parseDouble(getIntent().getStringExtra("cartTotal"));
+                            totalDiscountPrice = cartTotalPrice;
+                            cartTotal.setText(String.format("Cart Price : ₹ %s",cartTotalPrice));
+                            totalPrice.setText(String.format("Total Price : ₹ %s",totalDiscountPrice));
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+//        see if that user has used it or not
+    }
 }

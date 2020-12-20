@@ -54,6 +54,7 @@ public class CartMainActivity extends AppCompatActivity {
     private DatabaseReference mCartRef;
     private FirebaseAuth firebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
+    private double TotalPrice;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +75,7 @@ public class CartMainActivity extends AppCompatActivity {
                 Intent intent = new Intent(CartMainActivity.this, SelectAddressActivity.class);
                 intent.putExtra("message",createMessage());
                 intent.putExtra("wanumber","+916371830551");
+                intent.putExtra("cartTotal", String.valueOf(TotalPrice));
                 startActivity(intent);
 //
 //
@@ -131,7 +133,7 @@ public class CartMainActivity extends AppCompatActivity {
 
                                 mDelivery.setText("Delivery Charge : \u20B9 "+deliveryCharge);
 
-                                double TotalPrice = finalCartTotal + deliveryCharge;
+                                TotalPrice = finalCartTotal + deliveryCharge;
 
                                 mPriceTotal.setText("Total Price : \u20B9 "+TotalPrice);
 
@@ -159,7 +161,6 @@ public class CartMainActivity extends AppCompatActivity {
                     mPriceTotal.setText("Total Price : ₹ --");
                     mDelivery.setText("Delivery Charge : ₹ --");
                 }
-                myOrderMessage += "Total Price : \u20B9 "+(cartTotal+deliveryCharge)+"\n";
 
                 progressDialog.dismiss();
 
