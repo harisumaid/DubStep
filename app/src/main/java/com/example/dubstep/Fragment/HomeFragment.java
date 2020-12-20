@@ -52,7 +52,6 @@ public class HomeFragment extends Fragment {
 //          showing loading dialog on each call rather than just once when initialised
 //       2. Insert ImageView in each element in recycler view for item image
     FirebaseAuth firebaseAuth;
-    private FirebaseAuth.AuthStateListener mAuthStateListener;
     private DatabaseReference userref;
     private DatabaseReference foodref;
     private DatabaseReference cartref;
@@ -76,17 +75,7 @@ public class HomeFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         firebaseAuth = FirebaseAuth.getInstance();
-        mAuthStateListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                if (user == null) {
-                    Intent intent = new Intent(getContext(), LoginActivity.class);
-                    startActivity(intent);
-                    Objects.requireNonNull(getActivity()).finish();
-                }
-            }
-        };
+
 
         userref = FirebaseDatabase.getInstance().getReference("user").child(firebaseAuth.getCurrentUser().getUid());
 
@@ -147,7 +136,6 @@ public class HomeFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        firebaseAuth.addAuthStateListener(mAuthStateListener);
 
         FirebaseRecyclerOptions<FoodItem> options = new FirebaseRecyclerOptions.Builder<FoodItem>().setQuery(foodref, FoodItem.class).build();
         final FirebaseRecyclerAdapter<FoodItem, FoodItemViewHolder> adapter =
@@ -216,9 +204,4 @@ public class HomeFragment extends Fragment {
 
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        firebaseAuth.addAuthStateListener(mAuthStateListener);
-    }
 }

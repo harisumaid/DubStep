@@ -15,8 +15,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity android:name=".ConfirmActivity"></activity>
         <activity android:name=".ReferralActivity" />
+
+        <activity android:name=".AddAddressActivity"></activity>
+        <activity android:name=".SelectAddressActivity" />
+
         <activity android:name=".ViewHolder.ThankYouActivity" />
         <activity android:name=".Order_placed" />
         <activity
