@@ -15,8 +15,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <activity android:name=".ConfirmActivity"></activity>
+        <activity android:name=".ReferralActivity" />
+
         <activity android:name=".AddAddressActivity"></activity>
         <activity android:name=".SelectAddressActivity" />
+
         <activity android:name=".ViewHolder.ThankYouActivity" />
         <activity android:name=".Order_placed" />
         <activity
@@ -29,9 +34,7 @@
         <activity android:name=".SignUpActivity" />
         <activity android:name=".LoginActivity" />
         <activity android:name=".MainActivity" />
-        <activity android:name=".RiderMainActivity">
-
-        </activity>
+        <activity android:name=".RiderMainActivity" />
         <activity android:name=".Splash_Screen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -39,6 +42,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />

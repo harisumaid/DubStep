@@ -71,62 +71,12 @@ public class CartMainActivity extends AppCompatActivity {
         mplaceOrder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                PackageManager pm = getPackageManager();
-                try {
-                    PackageInfo info = pm.getPackageInfo("com.whatsapp",PackageManager.GET_META_DATA);
-                    if (info!=null){
-//                        TODO: change the phone no. to clients business whatsapp no.
-                        String phoneNumberWithCountryCode = "+916371830551";
-                        String message = createMessage();
-                        Intent sendIntent = new Intent(Intent.ACTION_VIEW);
-                        sendIntent.setData(Uri.parse(String.format("https://api.whatsapp.com/send?phone=%s&text=%s",
-                                phoneNumberWithCountryCode,
-                                message)));
-                        sendIntent.setPackage("com.whatsapp");
-                        startActivity(sendIntent);
-
-                    }
-
-
-                } catch (PackageManager.NameNotFoundException e){
-                    Toast.makeText(getBaseContext(),"Whatsapp is not installed please install that first",Toast.LENGTH_SHORT).show();
-
-                }
-//                final Intent intent = new Intent(CartMainActivity.this,MapsActivity.class);
-//                intent.putExtra("UID",firebaseAuth.getCurrentUser().getUid());
+                Intent intent = new Intent(CartMainActivity.this, ReferralActivity.class);
+                intent.putExtra("message",createMessage());
+                intent.putExtra("wanumber","+916371830551");
+                startActivity(intent);
 //
-//                userref.addListenerForSingleValueEvent(new ValueEventListener() {
-//                    @Override
-//                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                        user u = dataSnapshot.getValue(user.class);
-//                        intent.putExtra("PhoneNumber", u.PhoneNumber);
 //
-//                        mCartRef.child("Info").addListenerForSingleValueEvent(new ValueEventListener() {
-//                            @Override
-//                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                                CartInfo cartInfo = dataSnapshot.getValue(CartInfo.class);
-//                                intent.putExtra("cartTotal", Double.toString(cartInfo.getCartTotal()) );
-//
-//                                startActivity(intent);
-//
-//                                //Toast.makeText(CartMainActivity.this,"Cart Total : "+cartInfo.getCartTotal(),Toast.LENGTH_SHORT).show();
-//                            }
-//
-//                            @Override
-//                            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//                            }
-//                        });
-//
-//                        //startActivity(intent);
-//                        //Toast.makeText(CartMainActivity.this,"Phone Number : "+u.PhoneNumber,Toast.LENGTH_SHORT).show();
-//                    }
-//
-//                    @Override
-//                    public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//                    }
-//                });
             }
         });
     }
