@@ -15,6 +15,11 @@
             android:title="Profile"
             android:icon="@drawable/ic_baseline_person_outline_24"
             />
+        <item
+            android:id="@+id/nav_cart"
+            android:title="My Cart"
+            android:icon="@drawable/cart_icon"
+            />
     </group>
 
     <item android:title="APP">

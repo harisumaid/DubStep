@@ -1,5 +1,6 @@
 package com.example.dubstep;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -17,6 +18,11 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class ReferralActivity extends AppCompatActivity {
     EditText referral;
@@ -72,13 +78,23 @@ public class ReferralActivity extends AppCompatActivity {
 //                        TODO: change the phone no. to clients business whatsapp no.
                         String phoneNumberWithCountryCode = number;
 
-                        Intent sendIntent = new Intent(Intent.ACTION_VIEW);
+                        final Intent sendIntent = new Intent(Intent.ACTION_VIEW);
                         sendIntent.setData(Uri.parse(String.format("https://api.whatsapp.com/send?phone=%s&text=%s",
                                 phoneNumberWithCountryCode,
                                 message)));
                         sendIntent.setPackage("com.whatsapp");
-                        startActivity(sendIntent);
-
+//                        1. cartClear
+                        FirebaseDatabase.getInstance().getReference()
+                                .child("Cart")
+                                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                .setValue(null).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+//                              2. goto activity before cart
+                                startActivity(sendIntent);
+                                finish();
+                            }
+                        });
                     }
 
 

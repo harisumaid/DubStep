@@ -101,6 +101,7 @@ public class SelectAddressActivity extends AppCompatActivity {
         intent.putExtra("message",getIntent().getStringExtra("message"));
         intent.putExtra("wanumber",getIntent().getStringExtra("wanumber"));
         startActivity(intent);
+        finish();
 
     }
 }

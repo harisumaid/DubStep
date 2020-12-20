@@ -109,8 +109,9 @@ public class CartMainActivity extends AppCompatActivity {
                 int index = 0;
 //              TODO: Delivery Charge addition
 
-                final double deliveryCharge = 0;
+                final double deliveryCharge = 50;
                 if(dataSnapshot.exists()){
+                    mplaceOrder.setClickable(true);
                     for(DataSnapshot snap: dataSnapshot.getChildren()){
                         index++;
                         CartItem item = snap.getValue(CartItem.class);
@@ -123,6 +124,7 @@ public class CartMainActivity extends AppCompatActivity {
                                         item.getQuantity()
                                 );
                         final int finalCartTotal = cartTotal;
+                        mCartTotal.setText("Cart Total : \u20B9 "+cartTotal);
                         userref.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -151,9 +153,14 @@ public class CartMainActivity extends AppCompatActivity {
 
                     }
                 }
+                else{
+                    mplaceOrder.setClickable(false);
+                    mCartTotal.setText("Cart Total : ₹ ---");
+                    mPriceTotal.setText("Total Price : ₹ --");
+                    mDelivery.setText("Delivery Charge : ₹ --");
+                }
                 myOrderMessage += "Total Price : \u20B9 "+(cartTotal+deliveryCharge)+"\n";
 
-                mCartTotal.setText("CART TOTAL : \u20B9 "+cartTotal);
                 progressDialog.dismiss();
 
             }
