@@ -93,11 +93,14 @@ public class SelectAddressActivity extends AppCompatActivity {
 
     public void ContinueOrder(View view) {
 //        get all addresses and put in intent
-        Intent intent = new Intent();
+        Intent intent = new Intent(this,ReferralActivity.class);
         intent.putExtra("pincode",pincode.getText());
         intent.putExtra("address1",address1.getText());
         intent.putExtra("address2",address2.getText());
         intent.putExtra("address3",address3.getText());
+        intent.putExtra("message",getIntent().getStringExtra("message"));
+        intent.putExtra("wanumber",getIntent().getStringExtra("wanumber"));
+        startActivity(intent);
 
     }
 }

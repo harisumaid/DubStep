@@ -71,7 +71,7 @@ public class CartMainActivity extends AppCompatActivity {
         mplaceOrder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(CartMainActivity.this, ReferralActivity.class);
+                Intent intent = new Intent(CartMainActivity.this, SelectAddressActivity.class);
                 intent.putExtra("message",createMessage());
                 intent.putExtra("wanumber","+916371830551");
                 startActivity(intent);

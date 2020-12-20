@@ -62,6 +62,10 @@ public class ReferralActivity extends AppCompatActivity {
                 try {
                     Intent intent = getIntent();
                     String message = intent.getStringExtra("message");
+                    message+=String.format("Pincode: %s \n",intent.getStringExtra("pincode"));
+                    message+=String.format("Address1: %s \n",intent.getStringExtra("address1"));
+                    message+=String.format("Address2: %s \n",intent.getStringExtra("address2"));
+                    message+=String.format("Address3: %s \n",intent.getStringExtra("address3"));
                     String number = intent.getStringExtra("wanumber");
                     PackageInfo info = pm.getPackageInfo("com.whatsapp",PackageManager.GET_META_DATA);
                     if (info!=null){
