@@ -33,7 +33,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 
-// TODO: 1. change place order button to Continue button that takes to new activity
+//       1. change place order button to Continue button that takes to new activity
 //       2. Create a new activity where we have a editext and submit button
 //       3. Editext for promocode and submit button for placing order
 //       4. Submit Button should open a popup(Dialog) that askes for final confirmation
@@ -109,7 +109,7 @@ public class CartMainActivity extends AppCompatActivity {
                 int cartTotal = 0;
                 myOrderMessage = "";
                 int index = 0;
-//              TODO: Delivery Charge addition
+//              Delivery Charge addition
 
                 final double deliveryCharge = 50;
                 if(dataSnapshot.exists()){

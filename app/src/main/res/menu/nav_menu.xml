@@ -9,11 +9,13 @@
             android:id="@+id/nav_home"
             android:title="Home"
             android:icon="@drawable/ic_baseline_home_24"
+            android:checkable="true"
             />
         <item
             android:id="@+id/profile_nav"
             android:title="Profile"
-            android:icon="@drawable/ic_baseline_person_outline_24"
+            android:icon="@drawable/ic_baseline_person_24"
+            android:checkable="true"
             />
         <item
             android:id="@+id/nav_cart"

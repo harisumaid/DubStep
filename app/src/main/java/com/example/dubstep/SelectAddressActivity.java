@@ -3,6 +3,7 @@ package com.example.dubstep;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -29,6 +30,7 @@ public class SelectAddressActivity extends AppCompatActivity {
     public MaterialCardView addressCard;
     public ExtendedFloatingActionButton setAddress;
     public ExtendedFloatingActionButton continueOrderBtn;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +45,14 @@ public class SelectAddressActivity extends AppCompatActivity {
         addressCard = findViewById(R.id.show_address_card);
         setAddress = findViewById(R.id.set_address_btn);
         continueOrderBtn = findViewById(R.id.continueOrder);
+        progressDialog = new ProgressDialog(SelectAddressActivity.this);
+        progressDialog.show();
+        progressDialog.setContentView(R.layout.progress_dialog);
+        progressDialog.getWindow().setBackgroundDrawableResource(
+                android.R.color.transparent
+        );
+
+
 
 
         final Query query = FirebaseDatabase.getInstance()
@@ -69,6 +79,7 @@ public class SelectAddressActivity extends AppCompatActivity {
                     address2.setText(address.getAddress2());
                     address3.setText(address.getAddress3());
                 }
+                progressDialog.dismiss();
             }
 
             @Override

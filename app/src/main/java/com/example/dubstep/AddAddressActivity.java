@@ -3,6 +3,7 @@ package com.example.dubstep;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -33,7 +34,7 @@ public class AddAddressActivity extends AppCompatActivity {
     FirebaseDatabase mDatabase;
     DatabaseReference mPincode;
     String pincode;
-
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +48,12 @@ public class AddAddressActivity extends AppCompatActivity {
         mUser = FirebaseAuth.getInstance().getCurrentUser();
         mDatabase = FirebaseDatabase.getInstance();
         mPincode = mDatabase.getReference().child("pincode");
+        progressDialog = new ProgressDialog(AddAddressActivity.this);
+        progressDialog.show();
+        progressDialog.setContentView(R.layout.progress_dialog);
+        progressDialog.getWindow().setBackgroundDrawableResource(
+                android.R.color.transparent
+        );
         pincodeEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -76,7 +83,7 @@ public class AddAddressActivity extends AppCompatActivity {
                     address2EditText.setText(address.getAddress2());
                     address3EditText.setText(address.getAddress3());
                 }
-
+                progressDialog.dismiss();
             }
 
             @Override
@@ -88,17 +95,17 @@ public class AddAddressActivity extends AppCompatActivity {
     }
 
     public void addAddress(View view) {
+        progressDialog.show();
         pincodeNotFound.setVisibility(View.INVISIBLE);
         pincode = (pincodeEditText.getText().toString()!=null)?pincodeEditText.getText().toString():"";
         if(pincode.equals("")){
             Toast.makeText(this,"Pincode can't be blank",Toast.LENGTH_SHORT).show();
         } else {
-//        TODO: 1. Check pincode present or not
+//         1. Check pincode present or not
             mPincode.child(pincode).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if (snapshot.exists()) {
-                        Log.d("pincode", "onDataChange: " + pincode + " exists " + snapshot.getValue());
                         String address1 = (address1EditText.getText().toString() != null) ? address1EditText.getText().toString() : "";
                         String address2 = (address2EditText.getText().toString() != null) ? address2EditText.getText().toString() : "";
                         String address3 = (address3EditText.getText().toString() != null) ? address3EditText.getText().toString() : "";
@@ -116,7 +123,7 @@ public class AddAddressActivity extends AppCompatActivity {
                     } else {
                         pincodeNotFound.setVisibility(View.VISIBLE);
                     }
-
+                    progressDialog.dismiss();
                 }
 
                 @Override

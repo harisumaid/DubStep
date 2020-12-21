@@ -3,6 +3,7 @@ package com.example.dubstep;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -37,6 +38,8 @@ public class ReferralActivity extends AppCompatActivity {
     Double totalDiscountPrice;
     boolean promoUsed;
     String currPromo;
+    ProgressDialog progressDialog;
+    TextView discountOnPromo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,14 +52,14 @@ public class ReferralActivity extends AppCompatActivity {
         promoCodeText = findViewById(R.id.promocode_dicount_text);
         cartTotal = findViewById(R.id.cart_total_without_promo);
         totalPrice = findViewById(R.id.cart_total_with_promo);
+        discountOnPromo = findViewById(R.id.dicount_on_promo_textview);
         double cartTotalPrice = Double.parseDouble(getIntent().getStringExtra("cartTotal"));
         totalDiscountPrice = cartTotalPrice;
         cartTotal.setText(String.format("Cart Price : ₹ %s",cartTotalPrice));
         totalPrice.setText(String.format("Total Price : ₹ %s",totalDiscountPrice));
+        discountOnPromo.setVisibility(View.GONE);
         promoUsed = false;
-
-
-
+        progressDialog = new ProgressDialog(this);
     }
 
     public void btnPlaceOrder(View view) {
@@ -83,10 +86,18 @@ public class ReferralActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 PackageManager pm = getPackageManager();
+                progressDialog.show();
+                progressDialog.setContentView(R.layout.progress_dialog);
+                progressDialog.getWindow().setBackgroundDrawableResource(
+                        android.R.color.transparent
+                );
                 try {
                     Intent intent = getIntent();
                     String message = intent.getStringExtra("message");
                     message+=String.format("Total Price: %s \n ",totalDiscountPrice);
+                    if(promoUsed){
+                        message+=String.format("Promocode : %s \n ",currPromo);
+                    }
                     message+=String.format("Pincode: %s \n",intent.getStringExtra("pincode"));
                     message+=String.format("Address1: %s \n",intent.getStringExtra("address1"));
                     message+=String.format("Address2: %s \n",intent.getStringExtra("address2"));
@@ -94,7 +105,7 @@ public class ReferralActivity extends AppCompatActivity {
                     String number = intent.getStringExtra("wanumber");
                     PackageInfo info = pm.getPackageInfo("com.whatsapp",PackageManager.GET_META_DATA);
                     if (info!=null){
-//                        TODO: change the phone no. to clients business whatsapp no.
+//                        change the phone no. to clients business whatsapp no.
                         String phoneNumberWithCountryCode = number;
 
                         final Intent sendIntent = new Intent(Intent.ACTION_VIEW);
@@ -143,6 +154,17 @@ public class ReferralActivity extends AppCompatActivity {
 
     public void applyPromo(View view) {
 //        search if promocode exists
+        if(referral.getText().toString().equals("")){
+            Toast.makeText(this,"Enter Some Promocode to check",Toast.LENGTH_SHORT).show();
+            discountOnPromo.setVisibility(View.GONE);
+            return;
+        }
+        progressDialog.show();
+        progressDialog.setContentView(R.layout.progress_dialog);
+        progressDialog.getWindow().setBackgroundDrawableResource(
+                android.R.color.transparent
+        );
+        promoCodeText.setVisibility(View.VISIBLE);
         FirebaseDatabase.getInstance().getReference()
                 .child("promocode")
                 .child(referral.getText().toString())
@@ -157,12 +179,15 @@ public class ReferralActivity extends AppCompatActivity {
                                 double discount = Double.parseDouble(snapshot.child("discount").getValue().toString()) ;
                                 double cartTotalPrice = Double.parseDouble(getIntent().getStringExtra("cartTotal"));
                                 promoCodeText.setText(String.format("Promocode Applied \n Discount : %s %% ", discount));
+                                discountOnPromo.setText(String.format("Discount : - ₹ %s",(discount/100.0*cartTotalPrice) ));
                                 cartTotal.setText(String.format("Cart Price : ₹ %s",cartTotalPrice));
                                 totalDiscountPrice = cartTotalPrice - (discount/100.0*cartTotalPrice);
                                 totalPrice.setText(String.format("Total Price : ₹ %s",totalDiscountPrice));
                                 promoUsed = true;
                                 currPromo = referral.getText().toString();
+                                discountOnPromo.setVisibility(View.VISIBLE);
                             } else {
+                                discountOnPromo.setVisibility(View.GONE);
                                 promoUsed = false;
                                 promoCodeText.setText("Promocode can be used only once");
                                 double cartTotalPrice = Double.parseDouble(getIntent().getStringExtra("cartTotal"));
@@ -173,6 +198,7 @@ public class ReferralActivity extends AppCompatActivity {
 
 
                         } else{
+                            discountOnPromo.setVisibility(View.GONE);
                             promoUsed = false;
                             promoCodeText.setText("Promocode doesn't exists");
                             double cartTotalPrice = Double.parseDouble(getIntent().getStringExtra("cartTotal"));
@@ -180,6 +206,7 @@ public class ReferralActivity extends AppCompatActivity {
                             cartTotal.setText(String.format("Cart Price : ₹ %s",cartTotalPrice));
                             totalPrice.setText(String.format("Total Price : ₹ %s",totalDiscountPrice));
                         }
+                        progressDialog.dismiss();
                     }
 
                     @Override

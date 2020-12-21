@@ -154,6 +154,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 startActivity(new Intent(MainActivity.this, LoginActivity.class));
                 finish();
         }
+        navigationView.setCheckedItem(item);
 
         drawerLayout.closeDrawer(GravityCompat.START);
         return true;
@@ -164,7 +165,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         if(drawerLayout.isDrawerOpen(GravityCompat.START)){
             drawerLayout.closeDrawer(GravityCompat.START);
-        }else{
+        } if(navigationView.getCheckedItem().getItemId() == R.id.profile_nav){
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new HomeFragment()).commit();
+            navigationView.setCheckedItem(R.id.nav_home);
+        } else {
             super.onBackPressed();
         }
     }
