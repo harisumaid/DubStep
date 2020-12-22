@@ -4,16 +4,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
+    android:background="@color/colorAccent"
     tools:context=".Splash_Screen"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    >
 
     <ImageView
         android:id="@+id/logoImage"
         android:layout_width="match_parent"
         android:layout_height="350dp"
         android:layout_marginTop="20dp"
-        android:src="@drawable/food_dude_icon">
+        android:src="@drawable/ic_food_dude_icon"
+        >
 
     </ImageView>
 
@@ -25,7 +27,7 @@
         android:fontFamily="cursive"
         android:text="FoodDude"
         android:textAlignment="center"
-        android:textColor="#7C1818"
+        android:textColor="@color/colorPrimaryDark"
         android:textSize="40dp">
 
     </TextView>
@@ -38,7 +40,7 @@
         android:fontFamily="@font/audiowide"
         android:text="- Food at your Doorstep"
         android:textAlignment="center"
-        android:textColor="#B60202"
+        android:textColor="@color/colorPrimaryDark"
         android:textSize="20dp">
 
     </TextView>
