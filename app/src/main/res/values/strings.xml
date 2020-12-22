@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">DubStep</string>
+    <string name="app_name">FoodDude</string>
     <string name="openNavDrawer">Navigation Drawer Open</string>
     <string name="closeNavDrawer">Navigation Drawer Close</string>
     <string name="title_activity_rider_maps">Map</string>

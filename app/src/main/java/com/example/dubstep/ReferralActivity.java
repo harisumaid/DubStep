@@ -40,6 +40,7 @@ public class ReferralActivity extends AppCompatActivity {
     String currPromo;
     ProgressDialog progressDialog;
     TextView discountOnPromo;
+    int count;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,8 +130,13 @@ public class ReferralActivity extends AppCompatActivity {
                                             .child("users")
                                             .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                                             .setValue(true);
-
+                                    FirebaseDatabase.getInstance().getReference()
+                                            .child("promocode")
+                                            .child(currPromo)
+                                            .child("count")
+                                            .setValue(++count);
                                 }
+                                progressDialog.dismiss();
                                 startActivity(sendIntent);
                                 finish();
                             }
@@ -171,18 +177,42 @@ public class ReferralActivity extends AppCompatActivity {
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.exists()){
+                        if (snapshot.exists()) {
 //                            promocode exists
+//                            now check if it is disabled or not
+                            boolean active;
+                            if(snapshot.child("active").getValue() != null){
+                                active = Boolean.valueOf(snapshot.child("active").getValue().toString());
+                            } else {
+                                active = false;
+                            }
+                            int limit;
+                            if (snapshot.child("limit").getValue() != null) {
+                                limit = Integer.parseInt(snapshot.child("limit").getValue().toString());
+                            } else {
+                                limit = 0;
+                            }
+                            if (snapshot.child("count").getValue()!= null) {
+                                count = Integer.parseInt(snapshot.child("count").getValue().toString());
+                            } else {
+                                count = 0;
+                            }
+
+                            if (!active) {
+                                promoCodeText.setText("Promocode disabled");
+                            } else if (limit <= count) {
+                                promoCodeText.setText("Promocode using limit exhausted");
+                            } else if(true){
 //                            now check for user exists within it or not
                             if (!snapshot.child("users").hasChild(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
 //                                user has not used that promo
-                                double discount = Double.parseDouble(snapshot.child("discount").getValue().toString()) ;
+                                double discount = Double.parseDouble(snapshot.child("discount").getValue().toString());
                                 double cartTotalPrice = Double.parseDouble(getIntent().getStringExtra("cartTotal"));
                                 promoCodeText.setText(String.format("Promocode Applied \n Discount : %s %% ", discount));
-                                discountOnPromo.setText(String.format("Discount : - ₹ %s",(discount/100.0*cartTotalPrice) ));
-                                cartTotal.setText(String.format("Cart Price : ₹ %s",cartTotalPrice));
-                                totalDiscountPrice = cartTotalPrice - (discount/100.0*cartTotalPrice);
-                                totalPrice.setText(String.format("Total Price : ₹ %s",totalDiscountPrice));
+                                discountOnPromo.setText(String.format("Discount : - ₹ %s", (discount / 100.0 * cartTotalPrice)));
+                                cartTotal.setText(String.format("Cart Price : ₹ %s", cartTotalPrice));
+                                totalDiscountPrice = cartTotalPrice - (discount / 100.0 * cartTotalPrice);
+                                totalPrice.setText(String.format("Total Price : ₹ %s", totalDiscountPrice));
                                 promoUsed = true;
                                 currPromo = referral.getText().toString();
                                 discountOnPromo.setVisibility(View.VISIBLE);
@@ -192,10 +222,10 @@ public class ReferralActivity extends AppCompatActivity {
                                 promoCodeText.setText("Promocode can be used only once");
                                 double cartTotalPrice = Double.parseDouble(getIntent().getStringExtra("cartTotal"));
                                 totalDiscountPrice = cartTotalPrice;
-                                cartTotal.setText(String.format("Cart Price : ₹ %s",cartTotalPrice));
-                                totalPrice.setText(String.format("Total Price : ₹ %s",totalDiscountPrice));
+                                cartTotal.setText(String.format("Cart Price : ₹ %s", cartTotalPrice));
+                                totalPrice.setText(String.format("Total Price : ₹ %s", totalDiscountPrice));
                             }
-
+                        }
 
                         } else{
                             discountOnPromo.setVisibility(View.GONE);

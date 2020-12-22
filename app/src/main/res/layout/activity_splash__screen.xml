@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="350dp"
         android:layout_marginTop="20dp"
-        android:src="@drawable/delivery_man">
+        android:src="@drawable/food_dude_icon">
 
     </ImageView>
 
@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:fontFamily="cursive"
-        android:text="DubStep"
+        android:text="FoodDude"
         android:textAlignment="center"
         android:textColor="#7C1818"
         android:textSize="40dp">
@@ -36,7 +36,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:fontFamily="@font/audiowide"
-        android:text="- Dabba at your Doorstep"
+        android:text="- Food at your Doorstep"
         android:textAlignment="center"
         android:textColor="#B60202"
         android:textSize="20dp">
