@@ -15,13 +15,11 @@
         android:roundIcon="@drawable/food_dude_icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
-        <activity android:name=".ConfirmActivity"></activity>
+        <activity android:name=".FoodItemActivity"></activity>
+        <activity android:name=".ConfirmActivity" />
         <activity android:name=".ReferralActivity" />
-
-        <activity android:name=".AddAddressActivity"></activity>
+        <activity android:name=".AddAddressActivity" />
         <activity android:name=".SelectAddressActivity" />
-
         <activity android:name=".ViewHolder.ThankYouActivity" />
         <activity android:name=".Order_placed" />
         <activity

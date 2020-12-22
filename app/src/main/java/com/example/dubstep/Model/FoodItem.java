@@ -1,23 +1,23 @@
 package com.example.dubstep.Model;
 
 public class FoodItem {
-    String base_price;
+    int base_price;
     String name;
 
     public FoodItem(){
 
     }
 
-    public FoodItem(String price, String name) {
+    public FoodItem(int price, String name) {
         this.base_price = price;
         this.name = name;
     }
 
-    public String getBase_price() {
+    public int getBase_price() {
         return base_price;
     }
 
-    public void setBase_price(String base_price) {
+    public void setBase_price(int base_price) {
         this.base_price = base_price;
     }
 
