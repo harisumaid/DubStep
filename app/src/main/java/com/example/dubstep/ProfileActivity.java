@@ -20,6 +20,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.textfield.TextInputEditText;
@@ -94,11 +95,27 @@ public class ProfileActivity extends AppCompatActivity implements NavigationView
                         String Username = dataSnapshot.child("Username").getValue().toString();
                         String FullName = dataSnapshot.child("fullName").getValue().toString();
                         String Email = dataSnapshot.child("Email").getValue().toString();
+                        if(!Email.equals(firebaseAuth.getCurrentUser().getEmail())){
+                            FirebaseDatabase.getInstance().getReference()
+                                    .child("user")
+                                    .child(firebaseAuth.getCurrentUser().getUid())
+                                    .child("Email")
+                                    .setValue(firebaseAuth.getCurrentUser().getEmail())
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    mEmail.setText(firebaseAuth.getCurrentUser().getEmail());
+                                }
+                            });
+
+                        }else{
+                            mEmail.setText(Email);
+                        }
                         String PhoneNumber = dataSnapshot.child("PhoneNumber").getValue().toString();
                         mUsername.setText(Username);
                         mFullName.setText(FullName);
                         mMobileNumber.setText(PhoneNumber);
-                        mEmail.setText(Email);
+
                     }
 
                     @Override

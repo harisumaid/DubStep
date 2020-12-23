@@ -21,6 +21,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -39,6 +40,7 @@ public class ProfileFragment extends Fragment {
     private EditText mEmail;
     private Button UpdateButton;
     DatabaseReference databaseReference;
+    private FirebaseAuth firebaseAuth;
 
     @Nullable
     @Override
@@ -56,7 +58,7 @@ public class ProfileFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-
+        firebaseAuth = FirebaseAuth.getInstance();
         mUsername = view.findViewById(R.id.mUsername);
         mFullName = view.findViewById(R.id.mFullName);
         mMobileNumber = view.findViewById(R.id.mMobileNumber);
@@ -73,6 +75,22 @@ public class ProfileFragment extends Fragment {
                         String Username = dataSnapshot.child("Username").getValue().toString();
                         String FullName = dataSnapshot.child("fullName").getValue().toString();
                         String Email = dataSnapshot.child("Email").getValue().toString();
+                        if(!Email.equals(firebaseAuth.getCurrentUser().getEmail())){
+                            FirebaseDatabase.getInstance().getReference()
+                                    .child("user")
+                                    .child(firebaseAuth.getCurrentUser().getUid())
+                                    .child("Email")
+                                    .setValue(firebaseAuth.getCurrentUser().getEmail())
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            mEmail.setText(firebaseAuth.getCurrentUser().getEmail());
+                                        }
+                                    });
+
+                        }else{
+                            mEmail.setText(Email);
+                        }
                         String PhoneNumber = dataSnapshot.child("PhoneNumber").getValue().toString();
                         mUsername.setText(Username);
                         mFullName.setText(FullName);

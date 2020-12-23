@@ -105,14 +105,33 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
-        TextView userNameTextView = navigationView.getHeaderView(0).findViewById(R.id.userNameTextView);
-
-        userNameTextView.setText(String.format("Hi!\n%s", FirebaseAuth.getInstance().getCurrentUser().getDisplayName()));
+        greetingUserHeader();
 
         if(savedInstanceState==null){
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new HomeFragment()).commit();
             navigationView.setCheckedItem(R.id.nav_home);
         }
+    }
+
+    private void greetingUserHeader() {
+
+        FirebaseDatabase.getInstance().getReference()
+                .child("user")
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        TextView userNameTextView = navigationView.getHeaderView(0).findViewById(R.id.userNameTextView);
+
+                        userNameTextView.setText(String.format("Hi!\n%s", snapshot.child("Username").getValue().toString()));
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+
     }
 
     @Override
