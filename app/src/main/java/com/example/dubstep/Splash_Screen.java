@@ -36,7 +36,11 @@ public class Splash_Screen extends AppCompatActivity {
             public void run() {
 
                 if(currentUser != null) {
-                    startActivity(new Intent(Splash_Screen.this, MainActivity.class));
+                    if (currentUser.isEmailVerified()){
+                        startActivity(new Intent(Splash_Screen.this, MainActivity.class));
+                    } else {
+                        startActivity(new Intent(Splash_Screen.this, LoginActivity.class));
+                    }
                 } else {
                     startActivity(new Intent(Splash_Screen.this, LoginActivity.class));
                 }

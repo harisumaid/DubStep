@@ -40,7 +40,7 @@ public class ReferralActivity extends AppCompatActivity {
     String currPromo;
     ProgressDialog progressDialog;
     TextView discountOnPromo;
-    int count;
+    long count;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -186,14 +186,14 @@ public class ReferralActivity extends AppCompatActivity {
                             } else {
                                 active = false;
                             }
-                            int limit;
+                            long limit;
                             if (snapshot.child("limit").getValue() != null) {
-                                limit = Integer.parseInt(snapshot.child("limit").getValue().toString());
+                                limit = Long.parseLong(snapshot.child("limit").getValue().toString());
                             } else {
                                 limit = 0;
                             }
                             if (snapshot.child("count").getValue()!= null) {
-                                count = Integer.parseInt(snapshot.child("count").getValue().toString());
+                                count = Long.parseLong(snapshot.child("count").getValue().toString());
                             } else {
                                 count = 0;
                             }

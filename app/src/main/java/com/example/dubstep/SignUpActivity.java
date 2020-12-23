@@ -107,7 +107,7 @@ public class SignUpActivity extends AppCompatActivity {
                                             email
                                     );
 
-                                    FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+                                    final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
                                     UserProfileChangeRequest profileUpdate = new UserProfileChangeRequest.Builder()
                                             .setDisplayName(details.Username)
                                             .build();
@@ -122,7 +122,9 @@ public class SignUpActivity extends AppCompatActivity {
                                                 @Override
                                                 public void onComplete(@NonNull Task<Void> task) {
                                                     Toast.makeText(SignUpActivity.this, "Registration successful", Toast.LENGTH_SHORT).show();
-                                                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                                                    firebaseUser.sendEmailVerification();
+                                                    Toast.makeText(SignUpActivity.this,"Verify email , then login again",Toast.LENGTH_LONG).show();
+                                                    startActivity(new Intent(getApplicationContext(), LoginActivity.class));
                                                     progressDialog1.dismiss();
                                                     finish();
                                                 }

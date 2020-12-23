@@ -150,9 +150,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.log_out:
                 FirebaseAuth.getInstance().signOut();
-                mGoogleSignInClient.signOut();
-                startActivity(new Intent(MainActivity.this, LoginActivity.class));
-                finish();
+//                mGoogleSignInClient.signOut();
+                mGoogleSignInClient.revokeAccess().addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        startActivity(new Intent(MainActivity.this, LoginActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                        finish();
+                    }
+                });
+
         }
         navigationView.setCheckedItem(item);
 

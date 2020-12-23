@@ -52,7 +52,7 @@
         android:layout_marginTop="15dp"
         android:ems="10"
         android:hint="Mobile Number"
-        android:inputType="textPersonName"
+        android:inputType="phone"
         android:textAlignment="viewStart"
         android:textColorHighlight="#FF5722"
         android:textColorLink="#4CAF50"

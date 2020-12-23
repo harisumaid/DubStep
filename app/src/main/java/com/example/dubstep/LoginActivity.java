@@ -23,6 +23,7 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
@@ -40,8 +41,8 @@ public class LoginActivity extends AppCompatActivity {
     Button btn_login;
     private FirebaseAuth firebaseAuth;
     ProgressDialog progressDialog;
-    private SignInButton GoogleSignInButton;
-    private GoogleSignInClient mGoogleSignInClient;
+//    private SignInButton GoogleSignInButton;
+//    private GoogleSignInClient mGoogleSignInClient;
     private final static int RC_SIGN_IN = 1;
 
     private FirebaseAuth.AuthStateListener mAuthStateListener;
@@ -54,38 +55,45 @@ public class LoginActivity extends AppCompatActivity {
         txtemail = (EditText) findViewById(R.id.EmailLoginEditText);
         txtpassword = (EditText) findViewById(R.id.PasswordLoginEditText);
         btn_login = (Button) findViewById(R.id.LoginButton);
-        GoogleSignInButton = (SignInButton) findViewById(R.id.GoogleSignInButton);
+//        GoogleSignInButton = (SignInButton) findViewById(R.id.GoogleSignInButton);
 
         firebaseAuth = FirebaseAuth.getInstance();
-
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build();
-
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-
-        GoogleSignInButton.setOnClickListener(new View.OnClickListener() {
+        MaterialButton forgotPasswordBtn = findViewById(R.id.forgot_password_btn);
+        forgotPasswordBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                GSignIn();
+            public void onClick(View v) {
+                startActivity(new Intent(LoginActivity.this,PasswordResetActivity.class));
             }
         });
 
-        mAuthStateListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser mFireBaseUser = firebaseAuth.getCurrentUser();
-                if (mFireBaseUser != null){
-                    //FirebaseAuth.getInstance().signOut();
-                    //mGoogleSignInClient.signOut();
-                    //Toast.makeText(LoginActivity.this,  "You are logged in",Toast.LENGTH_LONG).show();
-                }
-                else {
-                    //Toast.makeText(LoginActivity.this,  "Please Log in",Toast.LENGTH_LONG).show();
-                }
-            }
-        };
+//        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+//                .requestIdToken(getString(R.string.default_web_client_id))
+//                .requestEmail()
+//                .build();
+
+//        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
+//        GoogleSignInButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                GSignIn();
+//            }
+//        });
+
+//        mAuthStateListener = new FirebaseAuth.AuthStateListener() {
+//            @Override
+//            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+//                FirebaseUser mFireBaseUser = firebaseAuth.getCurrentUser();
+//                if (mFireBaseUser != null){
+//                    //FirebaseAuth.getInstance().signOut();
+//                    //mGoogleSignInClient.signOut();
+//                    //Toast.makeText(LoginActivity.this,  "You are logged in",Toast.LENGTH_LONG).show();
+//                }
+//                else {
+//                    //Toast.makeText(LoginActivity.this,  "Please Log in",Toast.LENGTH_LONG).show();
+//                }
+//            }
+//        };
 
         btn_login.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -124,9 +132,16 @@ public class LoginActivity extends AppCompatActivity {
                                             .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).addValueEventListener(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                progressDialog.dismiss();
-                                                startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                                                finish();
+                                            progressDialog.dismiss();
+                                                    boolean verified = firebaseAuth.getCurrentUser().isEmailVerified();
+                                                    if (verified){
+                                                        startActivity(new Intent(LoginActivity.this,MainActivity.class));
+                                                        finish();
+                                                    } else{
+                                                        startActivity(new Intent(LoginActivity.this, UserVerifyActivity.class));
+                                                        finish();
+                                                    }
+
                                             }
 
                                         @Override
@@ -157,9 +172,9 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        firebaseAuth.addAuthStateListener(mAuthStateListener);
+//        firebaseAuth.addAuthStateListener(mAuthStateListener);
 
-        FirebaseUser user = firebaseAuth.getCurrentUser();
+//        FirebaseUser user = firebaseAuth.getCurrentUser();
 
     }
 
@@ -168,10 +183,10 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(new Intent(getApplicationContext(), SignUpActivity.class));
     }
 
-    public void GSignIn(){
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
-    }
+//    public void GSignIn(){
+//        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+//        startActivityForResult(signInIntent, RC_SIGN_IN);
+//    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
