@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
+import com.bumptech.glide.Glide;
 import com.example.dubstep.CartMainActivity;
 import com.example.dubstep.FoodItemActivity;
 import com.example.dubstep.Interface.ItemClickListener;
@@ -29,6 +30,7 @@ import com.example.dubstep.LoginActivity;
 import com.example.dubstep.MainActivity;
 import com.example.dubstep.Model.FoodClass;
 import com.example.dubstep.Model.FoodItem;
+import com.example.dubstep.Model.GlideApp;
 import com.example.dubstep.R;
 import com.example.dubstep.ViewHolder.FoodClassViewHolder;
 import com.example.dubstep.ViewHolder.FoodItemViewHolder;
@@ -48,6 +50,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -57,13 +61,14 @@ import java.util.Stack;
 
 public class HomeFragment extends Fragment {
 
-// TODO: 1. manage this fragment lifecycle properly
+    // TODO: 1. manage this fragment lifecycle properly
 //          showing loading dialog on each call rather than just once when initialised
 //       2. Insert ImageView in each element in recycler view for item image
     FirebaseAuth firebaseAuth;
     private DatabaseReference userref;
     private DatabaseReference foodref;
     private DatabaseReference cartref;
+    private StorageReference firebaseRef;
 
     RecyclerView recyclerView;
     RecyclerView.LayoutManager layoutManager;
@@ -84,10 +89,9 @@ public class HomeFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         firebaseAuth = FirebaseAuth.getInstance();
-
+        firebaseRef = FirebaseStorage.getInstance().getReference();
 
         userref = FirebaseDatabase.getInstance().getReference("user").child(firebaseAuth.getCurrentUser().getUid());
-
 
 
         foodref = FirebaseDatabase.getInstance().getReference().child("food_menu");
@@ -109,12 +113,11 @@ public class HomeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
 
-
         mCartButton = view.findViewById(R.id.cart_btn);
         recyclerView = view.findViewById(R.id.main_recyclerview);
         recyclerView.setHasFixedSize(true);
 
-        layoutManager = new GridLayoutManager(getContext(),2);
+        layoutManager = new GridLayoutManager(getContext(), 2);
         recyclerView.setLayoutManager(layoutManager);
 
         mCartButton.setOnClickListener(new View.OnClickListener() {
@@ -157,14 +160,18 @@ public class HomeFragment extends Fragment {
                     protected void onBindViewHolder(@NonNull final FoodClassViewHolder holder, final int position, @NonNull final FoodClass model) {
 
                         holder.foodClassTextView.setText(model.getBase_name());
-                        holder.foodClassCardView.setBackgroundTintList(ColorStateList.valueOf(rc.getColor()));
+                        GlideApp.with(getActivity())
+                                .load(firebaseRef.child(model.getBase_url()))
+                                .centerCrop()
+                                .into(holder.foodClassImageView);
+
                         holder.foodClassCardView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
 //                                take to that particular class
                                 Intent intent = new Intent(getContext(), FoodItemActivity.class);
-                                intent.putExtra("base_name",model.getBase_name());
-                                intent.putExtra("index",String.valueOf(position));
+                                intent.putExtra("base_name", model.getBase_name());
+                                intent.putExtra("index", String.valueOf(position));
                                 startActivity(intent);
                             }
                         });
@@ -190,24 +197,24 @@ class RandomColors {
 
     public RandomColors() {
         colors = new Stack<>();
-        recycle =new Stack<>();
+        recycle = new Stack<>();
         recycle.addAll(Arrays.asList(
-                0xfff44336,0xffe91e63,0xff9c27b0,0xff673ab7,
-                0xff3f51b5,0xff2196f3,0xff03a9f4,0xff00bcd4,
-                0xff009688,0xff4caf50,0xff8bc34a,0xffcddc39,
-                0xffffeb3b,0xffffc107,0xffff9800,0xffff5722,
-                0xff795548,0xff9e9e9e,0xff607d8b,0xff333333
+                0xfff44336, 0xffe91e63, 0xff9c27b0, 0xff673ab7,
+                0xff3f51b5, 0xff2196f3, 0xff03a9f4, 0xff00bcd4,
+                0xff009688, 0xff4caf50, 0xff8bc34a, 0xffcddc39,
+                0xffffeb3b, 0xffffc107, 0xffff9800, 0xffff5722,
+                0xff795548, 0xff9e9e9e, 0xff607d8b, 0xff333333
                 )
         );
     }
 
     public int getColor() {
-        if (colors.size()==0) {
-            while(!recycle.isEmpty())
+        if (colors.size() == 0) {
+            while (!recycle.isEmpty())
                 colors.push(recycle.pop());
             Collections.shuffle(colors);
         }
-        Integer c= colors.pop();
+        Integer c = colors.pop();
         recycle.push(c);
         return c;
     }
