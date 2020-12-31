@@ -22,6 +22,11 @@
             android:title="My Cart"
             android:icon="@drawable/cart_icon"
             />
+        <item
+            android:id="@+id/nav_order"
+            android:title="My Orders"
+            android:icon="@drawable/ic_baseline_shopping_bag_24"
+            />
     </group>
 
     <item android:title="APP">

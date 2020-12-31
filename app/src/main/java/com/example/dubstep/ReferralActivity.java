@@ -93,6 +93,8 @@ public class ReferralActivity extends AppCompatActivity {
                         android.R.color.transparent
                 );
                 try {
+//                    TODO:  1. Create a order table
+//                           2. Create orders page that shows list of orders
                     Intent intent = getIntent();
                     String message = intent.getStringExtra("message");
                     message+=String.format("Total Price: %s \n ",totalDiscountPrice);

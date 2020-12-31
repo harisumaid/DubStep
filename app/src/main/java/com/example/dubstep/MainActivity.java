@@ -167,6 +167,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Intent intent = new Intent(this, CartMainActivity.class);
                 startActivity(intent);
                 break;
+            case R.id.nav_order:
+                Intent orderIntent = new Intent(this, OrdersActivity.class);
+                startActivity(orderIntent);
+                break;
             case R.id.log_out:
                 FirebaseAuth.getInstance().signOut();
 //                mGoogleSignInClient.signOut();

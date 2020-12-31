@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.dubstep.Model.FoodItem;
+import com.example.dubstep.Model.GlideApp;
 import com.example.dubstep.ViewHolder.FoodClassViewHolder;
 import com.example.dubstep.ViewHolder.FoodItemViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -24,6 +25,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.HashMap;
 
@@ -33,6 +36,7 @@ public class FoodItemActivity extends AppCompatActivity {
     RecyclerView.LayoutManager layoutManager;
     String base_name;
     DatabaseReference cartref;
+    StorageReference storageRef;
 
     private FloatingActionButton mCartButton;
 
@@ -47,6 +51,7 @@ public class FoodItemActivity extends AppCompatActivity {
                 .child("food_menu")
                 .child(index)
                 .child("items");
+        storageRef = FirebaseStorage.getInstance().getReference();
         cartref = FirebaseDatabase.getInstance().getReference("Cart");
         TextView foodItemBaseName = findViewById(R.id.food_item_base_name);
         foodItemBaseName.setText(base_name);
@@ -69,7 +74,7 @@ public class FoodItemActivity extends AppCompatActivity {
                     @NonNull
                     @Override
                     public FoodItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                        View view = LayoutInflater.from(FoodItemActivity.this).inflate(R.layout.food_item_layout,parent,false);
+                        View view = LayoutInflater.from(FoodItemActivity.this).inflate(R.layout.food_item_layout_2,parent,false);
                         FoodItemViewHolder holder = new FoodItemViewHolder(view);
                         return holder;
                     }
@@ -86,6 +91,17 @@ public class FoodItemActivity extends AppCompatActivity {
                                 //Toast.makeText(MainActivity.this,getRef(position).getKey(),Toast.LENGTH_SHORT).show();
                             }
                         });
+                        String childName;
+                        if(model.getBase_url()!=null){
+                            childName = model.getBase_url();
+                        } else {
+                            childName = String.format("%s/%s.*",base_name.toLowerCase(),base_name.toLowerCase());
+                        }
+                        GlideApp.with(FoodItemActivity.this)
+                                .load(storageRef.child(childName))
+                                .centerCrop()
+                                .placeholder(R.drawable.splash_drawable)
+                                .into(holder.foodItemImageView);
                     }
                     };
         recyclerView.setAdapter(adapter);
