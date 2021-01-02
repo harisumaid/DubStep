@@ -21,13 +21,26 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.dubstep.Model.CartInfo;
+import com.example.dubstep.Model.CartItem;
+import com.example.dubstep.Model.OrderInfo;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 public class ReferralActivity extends AppCompatActivity {
     EditText referral;
@@ -40,6 +53,11 @@ public class ReferralActivity extends AppCompatActivity {
     String currPromo;
     ProgressDialog progressDialog;
     TextView discountOnPromo;
+    FirebaseUser mUser;
+    DatabaseReference mCart;
+    CartInfo cartInfo;
+    List<Object> cartItemList;
+    DatabaseReference mOrder;
     long count;
 
     @Override
@@ -47,7 +65,10 @@ public class ReferralActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_referral);
-
+        cartItemList = new ArrayList<>();
+        mUser = FirebaseAuth.getInstance().getCurrentUser();
+        mCart = FirebaseDatabase.getInstance().getReference("Cart").child(mUser.getUid());
+        mOrder = FirebaseDatabase.getInstance().getReference("order").child("placed");
         referral = findViewById(R.id.edit_text_referral);
         placeOrder = findViewById(R.id.button_place_order);
         promoCodeText = findViewById(R.id.promocode_dicount_text);
@@ -95,59 +116,63 @@ public class ReferralActivity extends AppCompatActivity {
                 try {
 //                    TODO:  1. Create a order table
 //                           2. Create orders page that shows list of orders
-                    Intent intent = getIntent();
-                    String message = intent.getStringExtra("message");
-                    message+=String.format("Total Price: %s \n ",totalDiscountPrice);
-                    if(promoUsed){
-                        message+=String.format("Promocode : %s \n ",currPromo);
-                    }
-                    message+=String.format("Pincode: %s \n",intent.getStringExtra("pincode"));
-                    message+=String.format("Address1: %s \n",intent.getStringExtra("address1"));
-                    message+=String.format("Address2: %s \n",intent.getStringExtra("address2"));
-                    message+=String.format("Address3: %s \n",intent.getStringExtra("address3"));
-                    String number = intent.getStringExtra("wanumber");
-                    PackageInfo info = pm.getPackageInfo("com.whatsapp",PackageManager.GET_META_DATA);
-                    if (info!=null){
-//                        change the phone no. to clients business whatsapp no.
-                        String phoneNumberWithCountryCode = number;
+                    Date date = new Date();
 
-                        final Intent sendIntent = new Intent(Intent.ACTION_VIEW);
-                        sendIntent.setData(Uri.parse(String.format("https://api.whatsapp.com/send?phone=%s&text=%s",
-                                phoneNumberWithCountryCode,
-                                message)));
-                        sendIntent.setPackage("com.whatsapp");
-//                        1. cartClear
-                        FirebaseDatabase.getInstance().getReference()
-                                .child("Cart")
-                                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                .setValue(null).addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-//                              2. goto activity before cart
-//                                add user to promocode used
-                                if (promoUsed){
-                                    FirebaseDatabase.getInstance().getReference()
-                                            .child("promocode")
-                                            .child(currPromo)
-                                            .child("users")
-                                            .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                            .setValue(true);
-                                    FirebaseDatabase.getInstance().getReference()
-                                            .child("promocode")
-                                            .child(currPromo)
-                                            .child("count")
-                                            .setValue(++count);
-                                }
-                                progressDialog.dismiss();
-                                startActivity(sendIntent);
-                                finish();
+                    SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+                    final String dateString = formatter.format(date);
+                    mCart.child("Info").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            if(snapshot.exists()) {
+
+                                cartInfo = snapshot.getValue(CartInfo.class);
+                                mCart.child("Products").addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        if(snapshot.exists()) {
+                                            for(DataSnapshot snap : snapshot.getChildren()) {
+
+
+                                                cartItemList.add(snap.getValue(CartItem.class));
+                                                OrderInfo orderInfo = new OrderInfo(
+                                                        dateString,
+                                                        cartItemList,
+                                                        cartInfo,
+                                                        mUser.getUid()
+                                                );
+                                                mOrder.child(mUser.getUid()).setValue(orderInfo).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        // Order layout is to be created
+                                                        finish();
+                                                    }
+                                                });
+
+                                            }
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+
+                                    }
+                                });
                             }
-                        });
-                    }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
 
 
-                } catch (PackageManager.NameNotFoundException e){
-                    Toast.makeText(getBaseContext(),"Whatsapp is not installed please install that first",Toast.LENGTH_SHORT).show();
+//                    HashMap<String, Object> order = new HashMap<>();
+
+
+
+                } catch (Exception e){
+                    Toast.makeText(getBaseContext(),"Something is not right",Toast.LENGTH_SHORT).show();
 
                 }
 
